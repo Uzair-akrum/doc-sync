@@ -1,0 +1,25 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+}
+
+type Query {
+  findAll: [User!]!
+  findOne(id: Float!): User!
+}
+
+type Mutation {
+  create: User!
+  update(updateUserInput: UpdateUserInput!): User!
+  remove(id: Float!): User!
+}
+
+input UpdateUserInput {
+  id: ID!
+}
