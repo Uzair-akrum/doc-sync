@@ -7,19 +7,19 @@ import { User } from './entities/user.entity';
 export class UserResolver {
   constructor(private readonly userService: UserService) {}
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   async create(
     @Args('createUserInput') createUserInput: CreateUserInput,
   ): Promise<User> {
     return this.userService.create(createUserInput);
   }
 
-  @Query((returns) => [User])
+  @Query(() => [User])
   findAll() {
     return this.userService.findAll();
   }
 
-  @Query((returns) => User)
+  @Query(() => User)
   findOne(@Args('id') id: number) {
     return this.userService.findOne(id);
   }

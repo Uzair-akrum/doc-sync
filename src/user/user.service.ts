@@ -3,13 +3,14 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Mutation } from '@nestjs/graphql';
 import { User } from './entities/user.entity';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  @Mutation((returns) => User)
+  constructor(private readonly prisma: PrismaService) {}
+
   async create(createUserInput: CreateUserInput) {
-    const user = new User();
-    return user;
+    return await this.prisma.user.create({ data: createUserInput });
   }
 
   findAll() {
