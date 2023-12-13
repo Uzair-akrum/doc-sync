@@ -1,0 +1,15 @@
+version: '3.3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: sync_db
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - ./backend/db_data/:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB_LIST: doc_sync
