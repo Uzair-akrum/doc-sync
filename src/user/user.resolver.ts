@@ -1,6 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { CreateUserInput } from './dto/create-user.input';
+import { CreateFollowerInput, CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 @Resolver((of) => User)
@@ -23,8 +23,12 @@ export class UserResolver {
   findOne(@Args('id') id: number) {
     return this.userService.findOne(id);
   }
+  @Mutation(() => User)
+  async followUser(createFollowerInput: CreateFollowerInput) {
+    return this.userService.followUser(createFollowerInput);
+  }
 
-  @Mutation((returns) => User)
+  @Mutation(() => User)
   update(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return this.userService.update(updateUserInput.id, updateUserInput);
   }

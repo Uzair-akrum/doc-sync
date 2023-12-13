@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from './dto/create-user.input';
+import { CreateUserInput, CreateFollowerInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { Mutation } from '@nestjs/graphql';
 import { User } from './entities/user.entity';
@@ -15,6 +15,10 @@ export class UserService {
 
   findAll() {
     return `This action returns all user`;
+  }
+
+  async followUser(createFollowerInput: CreateFollowerInput) {
+    return await this.prisma.userFollower.create({ data: createFollowerInput });
   }
 
   findOne(id: number) {
