@@ -16,4 +16,20 @@ model User {
   name     String   
   email    String   @unique
   password String 
+  follower  UserFollower[]
+}
+model Follower {
+  id        Int    @id @default(autoincrement())
+  user UserFollower[]
+
+}
+
+model UserFollower {
+  id        Int    @id @default(autoincrement())
+  userId    Int
+  followerId Int
+  user      User   @relation( fields: [userId], references: [id])
+  follower  Follower   @relation( fields: [followerId], references: [id])
+
+  @@unique([userId, followerId])
 }
