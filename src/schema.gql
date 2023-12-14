@@ -16,6 +16,7 @@ type Query {
 
 type Mutation {
   create(createUserInput: CreateUserInput!): User!
+  followUser: User!
   update(updateUserInput: UpdateUserInput!): User!
   remove(id: Float!): User!
 }
