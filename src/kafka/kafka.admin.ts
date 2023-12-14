@@ -4,26 +4,24 @@ import {
   OnApplicationBootstrap,
   OnModuleInit,
 } from '@nestjs/common';
-import { Kafka, Message, Producer, logLevel, Admin } from 'kafkajs';
+import { Admin } from 'kafkajs';
 import { ConfigService } from '@nestjs/config';
 import { sleep } from 'src/utils/sleep';
+import { KafkaService } from './kafka.service';
 
 @Injectable()
 export class KafkajsAdmin implements OnApplicationBootstrap {
-  private readonly kafka: Kafka;
   private readonly logger: Logger;
   private readonly admin: Admin;
 
-  constructor(private readonly configService: ConfigService) {
-    this.logger = new Logger();
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly kafkaService: KafkaService,
+  ) {
+    this.logger = new Logger(KafkajsAdmin.name);
     this.logger.log('Constructor Called');
-    this.kafka = new Kafka({
-      logLevel: logLevel.INFO,
-      brokers: [`${this.configService.get('HOST')}:9092`],
-      clientId: '1',
-    });
 
-    this.admin = this.kafka.admin();
+    this.admin = this.kafkaService.getAdmin();
   }
 
   async connect() {
@@ -31,6 +29,15 @@ export class KafkajsAdmin implements OnApplicationBootstrap {
       this.logger.log('Connecting Admin...');
       await this.admin.connect();
       this.logger.log('Connected to kafka Admin');
+
+      await this.admin.createTopics({
+        topics: [{ topic: this.configService.get('TOPIC') }],
+        waitForLeaders: true,
+        validateOnly: false,
+        timeout: 10000,
+      });
+
+      this.logger.log('Topic Created', this.configService.get('TOPIC'));
     } catch (err) {
       this.logger.error('Failed to connect to Kafka.', err);
       await sleep(5000);
