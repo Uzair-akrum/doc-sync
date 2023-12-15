@@ -9,9 +9,17 @@ type User {
   password: String!
 }
 
+type Post {
+  id: ID!
+  title: String!
+  content: String!
+  authorId: Int!
+}
+
 type Query {
   findAll: [User!]!
   findOne(id: Float!): User!
+  post(id: Int!): Post!
 }
 
 type Mutation {
@@ -19,6 +27,9 @@ type Mutation {
   followUser: User!
   update(updateUserInput: UpdateUserInput!): User!
   remove(id: Float!): User!
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: Int!): Post!
 }
 
 input CreateUserInput {
@@ -29,4 +40,17 @@ input CreateUserInput {
 
 input UpdateUserInput {
   id: ID!
+}
+
+input CreatePostInput {
+  title: String!
+  content: String!
+  authorId: Int!
+}
+
+input UpdatePostInput {
+  title: String
+  content: String
+  authorId: Int
+  id: Int!
 }

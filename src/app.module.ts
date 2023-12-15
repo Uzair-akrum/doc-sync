@@ -8,9 +8,11 @@ import { UserModule } from './user/user.module';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { KafkaModule } from './kafka/kafka.module';
 import { ConfigModule } from '@nestjs/config';
+import { PostModule } from './post/post.module';
 @Module({
   imports: [
     UserModule,
+    PostModule,
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env'] }),
     KafkaModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -20,6 +22,7 @@ import { ConfigModule } from '@nestjs/config';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
     }),
     KafkaModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
