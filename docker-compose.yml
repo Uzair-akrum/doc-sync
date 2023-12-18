@@ -20,6 +20,11 @@ services:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
+  my-app:
+    image: nest-app:latest
+    container_name: nest-app
+    ports:
+      - '3000:3000'
 
   kafka:
     image: 'bitnami/kafka:latest'

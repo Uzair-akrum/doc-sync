@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
-    "gen-typings": "ts-node ./src/gen-typings",
+    "gen-typings": "ts-node src/generate-typings.ts",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -35,7 +35,8 @@
     "lodash": "^4.17.21",
     "prisma": "^5.7.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "ts-morph": "^20.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

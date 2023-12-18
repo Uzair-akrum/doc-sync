@@ -2,34 +2,66 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
-
 
 model User {
-  id       Int      @id @default(autoincrement())
-  name     String   
-  email    String   @unique
-  password String 
-  follower  UserFollower[]
+    id       Int            @id @default(autoincrement())
+    name     String
+    email    String         @unique
+    password String
+    posts    Post[]
+    follower UserFollower[]
 }
-model Follower {
-  id        Int    @id @default(autoincrement())
-  user UserFollower[]
 
+model Post {
+    id        Int      @id @default(autoincrement())
+    title     String
+    content   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Define the one-to-many relationship with User
+    author   User    @relation(fields: [authorId], references: [id])
+    authorId Int
+    images   Image[]
+    videos   Video[]
+
+    // Add more fields as needed
+}
+
+model Image {
+    id  Int    @id @default(autoincrement())
+    url String
+
+    post   Post @relation(fields: [postId], references: [id])
+    postId Int
+}
+
+model Video {
+    id  Int    @id @default(autoincrement())
+    url String
+
+    post   Post @relation(fields: [postId], references: [id])
+    postId Int
+}
+
+model Follower {
+    id   Int            @id @default(autoincrement())
+    user UserFollower[]
 }
 
 model UserFollower {
-  id        Int    @id @default(autoincrement())
-  userId    Int
-  followerId Int
-  user      User   @relation( fields: [userId], references: [id])
-  follower  Follower   @relation( fields: [followerId], references: [id])
+    id         Int      @id @default(autoincrement())
+    userId     Int
+    followerId Int
+    user       User     @relation(fields: [userId], references: [id])
+    follower   Follower @relation(fields: [followerId], references: [id])
 
-  @@unique([userId, followerId])
+    @@unique([userId, followerId])
 }
