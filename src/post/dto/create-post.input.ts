@@ -10,4 +10,10 @@ export class CreatePostInput {
 
   @Field(() => Int)
   authorId: number;
+
+  @Field(() => [String], { nullable: true })
+  images?: string[];
+
+  @Field(() => [String], { nullable: true })
+  videos?: string[];
 }

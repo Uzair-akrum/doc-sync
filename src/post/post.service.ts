@@ -12,7 +12,10 @@ export class PostService {
     private readonly kafkaProducer: KafkajsProducer,
   ) {}
   async create(createPostInput: CreatePostInput) {
-    const post = await this.prisma.post.create({ data: createPostInput });
+    const { title, authorId, content } = createPostInput;
+    const post = await this.prisma.post.create({
+      data: { title, authorId, content },
+    });
     await this.kafkaProducer.producePostMessage(
       'notify',
       post.authorId.toString(),

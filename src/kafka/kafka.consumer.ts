@@ -1,10 +1,5 @@
-import {
-  Injectable,
-  Logger,
-  OnApplicationBootstrap,
-  OnModuleInit,
-} from '@nestjs/common';
-import { Kafka, Message, Consumer } from 'kafkajs';
+import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Consumer } from 'kafkajs';
 import { sleep } from '../utils/sleep';
 import { KafkaService } from './kafka.service';
 
@@ -24,17 +19,17 @@ export class KafkajsConsumer implements OnModuleInit {
     await this.connect();
     this.logger.log('Consumer Connected==');
 
-    await this.subscribe();
-    this.logger.log('Consumer Subscribed==');
-
     await this.consume();
     this.logger.log('Consumed==');
   }
   async onModuleDestroy() {
     await this.disconnect();
   }
-  async subscribe() {
-    await this.consumer.subscribe({ topic: 'notify', fromBeginning: true });
+  async subscribe(topic) {
+    await this.consumer.subscribe({
+      topic: `notify_${topic}`,
+      fromBeginning: true,
+    });
   }
   async consume() {
     await this.consumer.run({

@@ -25,7 +25,7 @@ export class UserService {
     const post = await this.prisma.userFollower.create({
       data: createFollowerInput,
     });
-    await this.kafkaConsumer.consume();
+    await this.kafkaConsumer.subscribe(post.userId);
   }
 
   findOne(id: number) {
