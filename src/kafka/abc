@@ -1,0 +1,6 @@
+
+
+
+User => Posts => Sends Event = {'notify',{Post Details}} 
+
+Consumer
