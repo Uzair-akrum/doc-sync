@@ -20,11 +20,37 @@ services:
       - '2181:2181'
     environment:
       - ALLOW_ANONYMOUS_LOGIN=yes
-  my-app:
-    image: nest-app:latest
-    container_name: nest-app
+
+  conduktor-platform:
+    image: conduktor/conduktor-platform:1.6.0
     ports:
-      - '3000:3000'
+      - 8080:8080
+    volumes:
+      - conduktor_data:/var/conduktor
+      - type: bind
+        source: './${CONF_NAME:-platform-config}.yaml'
+        target: /opt/conduktor/platform-config.yaml
+        read_only: true
+    depends_on:
+      - kafka
+    environment:
+      CDK_IN_CONF_FILE: /opt/conduktor/platform-config.yaml
+      KAFKA_BOOTSTRAP_SERVER: kafka:9093
+      SR_SERVER: 'http://schema-registry:8081'
+      LICENSE_KEY: '${LICENSE_KEY}'
+      ORGANISATION_NAME: '${ORGANISATION_NAME}'
+      ADMIN_EMAIL: '${ADMIN_EMAIL}'
+      ADMIN_PSW: '${ADMIN_PSW}'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'curl --fail http://localhost:${CDK_LISTENING_PORT:-8080}/platform/api/modules/health/live',
+        ]
+      interval: 30s
+      start_period: 120s # Leave time for the psql init scripts to run
+      timeout: 5s
+      retries: 3
 
   kafka:
     image: 'bitnami/kafka:latest'
@@ -32,6 +58,7 @@ services:
     ports:
       - '9092:9092'
       - '9093:9093'
+      - '9101:9101'
     environment:
       - KAFKA_BROKER_ID=1
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
@@ -39,6 +66,16 @@ services:
       - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
       - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
       - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_AUTHORIZER_CLASS_NAME=kafka.security.authorizer.AclAuthorizer
+      - KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND=true
       - KAFKA_INTER_BROKER_LISTENER_NAME=CLIENT
+      - JMX_EXPORTER_ENABLE=yes
+      - JMX_EXPORTER_PORT=9101
+      - JMX_EXPORTER_CONFIG=/etc/jmx-exporter.yml
     depends_on:
       - zookeeper
+volumes:
+  zookeeper_data: {}
+  zookeeper_datalog: {}
+  kafka_data: {}
+  conduktor_data: {}
