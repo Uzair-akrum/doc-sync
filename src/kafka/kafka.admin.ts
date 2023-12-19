@@ -29,20 +29,21 @@ export class KafkajsAdmin implements OnApplicationBootstrap {
       this.logger.log('Connecting Admin...');
       await this.admin.connect();
       this.logger.log('Connected to kafka Admin');
-
-      await this.admin.createTopics({
-        topics: [{ topic: this.configService.get('TOPIC') }],
-        waitForLeaders: true,
-        validateOnly: false,
-        timeout: 10000,
-      });
-
-      this.logger.log('Topic Created', this.configService.get('TOPIC'));
     } catch (err) {
       this.logger.error('Failed to connect to Kafka.', err);
       await sleep(5000);
       await this.connect();
     }
+  }
+  async createTopic(topic) {
+    await this.admin.createTopics({
+      topics: [{ topic }],
+      waitForLeaders: true,
+      validateOnly: false,
+      timeout: 10000,
+    });
+
+    this.logger.log('Topic Created', topic);
   }
   async onApplicationBootstrap() {
     await this.connect();

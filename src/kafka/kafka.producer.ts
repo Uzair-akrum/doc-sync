@@ -15,9 +15,9 @@ export class KafkajsProducer implements OnApplicationBootstrap {
   async onApplicationBootstrap() {
     await this.connect();
   }
-  async produce(topic, message: Message) {
-    await this.producer.send({ topic, messages: [message] });
-  }
+  //  async produce(topic, message: Message) {
+  //    await this.producer.send({ topic, messages: [message] });
+  //  }
 
   async connect() {
     try {
@@ -29,16 +29,24 @@ export class KafkajsProducer implements OnApplicationBootstrap {
     }
   }
 
-  async producePostMessage(topic: string, key: string, value: any) {
-    await this.producer.send({
-      topic,
-      messages: [
-        {
-          key,
-          value: JSON.stringify(value),
-        },
-      ],
-    });
+  async produce(topic: string, key: string, value: any) {
+    try {
+ const sended=     await this.producer.send({
+        topic: `${topic}-${key}`,
+        messages: [
+          {
+            key,
+            value: JSON.stringify(value),
+          },
+        ],
+      });
+	  console.log(sended)
+    } catch (err) {
+      console.log(
+        '🚀 ~ file: kafka.producer.ts:44 ~ KafkajsProducer ~ produce ~ err:',
+        err,
+      );
+    }
   }
 
   async disconnect() {

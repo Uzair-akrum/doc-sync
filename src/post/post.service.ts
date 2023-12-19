@@ -16,7 +16,7 @@ export class PostService {
     const post = await this.prisma.post.create({
       data: { title, authorId, content },
     });
-    await this.kafkaProducer.producePostMessage(
+    await this.kafkaProducer.produce(
       'notify',
       post.authorId.toString(),
       post,

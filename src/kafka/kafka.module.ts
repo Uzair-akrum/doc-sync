@@ -6,6 +6,6 @@ import { KafkajsProducer } from './kafka.producer';
 
 @Module({
   providers: [KafkajsAdmin, KafkaService, KafkajsConsumer, KafkajsProducer],
-  exports: [KafkajsConsumer, KafkajsProducer],
+  exports: [KafkajsConsumer, KafkajsProducer, KafkajsAdmin],
 })
 export class KafkaModule {}

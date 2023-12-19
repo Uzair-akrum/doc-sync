@@ -5,12 +5,15 @@ import { Mutation } from '@nestjs/graphql';
 import { User } from './entities/user.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { KafkajsConsumer } from 'src/kafka/kafka.consumer';
+import { KafkajsProducer } from 'src/kafka/kafka.producer';
+import { KafkajsAdmin } from 'src/kafka/kafka.admin';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly kafkaConsumer: KafkajsConsumer,
+    private readonly kafkajsAdmin: KafkajsAdmin,
   ) {}
 
   async create(createUserInput: CreateUserInput) {
@@ -23,21 +26,22 @@ export class UserService {
 
   async followUser(createFollowerInput: CreateFollowerInput) {
     const { userId, followerId } = createFollowerInput;
+    console.log("🚀 ~ file: user.service.ts:29 ~ UserService ~ followUser ~ userId:", userId)
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    const follower = await this.prisma.follower.create({
-      data: { id: followerId },
-    });
-    if (!user || !follower) {
-      return 'Not Found';
-    }
-    const userFollower = await this.prisma.userFollower.create({
-      data: createFollowerInput,
-    });
- 
-    await this.kafkaConsumer.subscribe(user.id);
-	return userFollower;
+    //const follower = await this.prisma.follower.create({
+    //  data: { id: followerId },
+    //});
+    //if (!user || !follower) {
+    //  return 'Not Found';
+    //}
+    //const userFollower = await this.prisma.userFollower.create({
+    //  data: createFollowerInput,
+    //});
+    await this.kafkajsAdmin.createTopic(`notify-${user.id}`);
 
+    await this.kafkaConsumer.subscribe(`notify-${user.id}`);
+    return null;
   }
 
   findOne(id: number) {

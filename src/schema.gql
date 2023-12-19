@@ -2,6 +2,11 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type UserFollowerOutput {
+  userId: Int!
+  followerId: Int!
+}
+
 type User {
   id: ID!
   name: String!
@@ -24,7 +29,7 @@ type Query {
 
 type Mutation {
   create(createUserInput: CreateUserInput!): User!
-  followUser: User!
+  followUser(createFollowerInput: CreateFollowerInput!): UserFollowerOutput!
   update(updateUserInput: UpdateUserInput!): User!
   remove(id: Float!): User!
   createPost(createPostInput: CreatePostInput!): Post!
@@ -36,6 +41,11 @@ input CreateUserInput {
   name: String!
   email: String!
   password: String!
+}
+
+input CreateFollowerInput {
+  userId: Int!
+  followerId: Int!
 }
 
 input UpdateUserInput {

@@ -27,11 +27,13 @@ export class KafkajsConsumer implements OnModuleInit {
   }
   async subscribe(topic) {
     await this.consumer.subscribe({
-      topic: `notify_${topic}`,
+      topic,
       fromBeginning: true,
     });
   }
   async consume() {
+    console.log('Message Consumed=====');
+
     await this.consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
         const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
