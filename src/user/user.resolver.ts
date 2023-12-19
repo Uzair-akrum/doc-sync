@@ -1,6 +1,10 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UserService } from './user.service';
-import { CreateFollowerInput, CreateUserInput } from './dto/create-user.input';
+import {
+  CreateFollowerInput,
+  CreateUserInput,
+  UserFollowerOutput,
+} from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
 @Resolver((of) => User)
@@ -23,9 +27,11 @@ export class UserResolver {
   findOne(@Args('id') id: number) {
     return this.userService.findOne(id);
   }
-  @Mutation(() => User)
-  async followUser(createFollowerInput: CreateFollowerInput) {
-    return this.userService.followUser(createFollowerInput);
+  @Mutation(() => UserFollowerOutput)
+  async followUser(
+    @Args('createFollowerInput') createFollowerInput: CreateFollowerInput,
+  ) {
+    return await this.userService.followUser(createFollowerInput);
   }
 
   @Mutation(() => User)

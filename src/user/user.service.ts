@@ -22,10 +22,22 @@ export class UserService {
   }
 
   async followUser(createFollowerInput: CreateFollowerInput) {
-    const post = await this.prisma.userFollower.create({
+    const { userId, followerId } = createFollowerInput;
+
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const follower = await this.prisma.follower.create({
+      data: { id: followerId },
+    });
+    if (!user || !follower) {
+      return 'Not Found';
+    }
+    const userFollower = await this.prisma.userFollower.create({
       data: createFollowerInput,
     });
-    await this.kafkaConsumer.subscribe(post.userId);
+ 
+    await this.kafkaConsumer.subscribe(user.id);
+	return userFollower;
+
   }
 
   findOne(id: number) {
