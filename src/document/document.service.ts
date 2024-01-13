@@ -1,10 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Redis } from '@upstash/redis';
+import { PrismaService } from 'src/prisma/prisma.service';
+
+type createDocumentDto = {
+  name: string;
+};
 
 @Injectable()
 export class DocumentService {
   private redis: Redis;
-  constructor() {
+  constructor(private readonly prismaService: PrismaService) {
     this.redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL || '',
       token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
@@ -15,5 +20,10 @@ export class DocumentService {
   }
   async getDocumentbyId() {
     return await this.redis.get('content');
+  }
+  async createDocument(createDocument: any) {
+    const { name } = createDocument;
+    console.log("🚀 ~ DocumentService ~ createDocument ~ name:", name)
+    return await this.prismaService.document.create({ data: { author: name } });
   }
 }

@@ -19,11 +19,13 @@ import { Redis } from '@upstash/redis';
 export class DocmentGateway {
   @WebSocketServer() server: Server;
   private redis: Redis;
+  private counter: number;
   constructor(private readonly messageService: DocumentService) {
     this.redis = new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL || '',
       token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
     });
+    this.counter = 0;
   }
 
   @SubscribeMessage('create-message')
@@ -31,7 +33,9 @@ export class DocmentGateway {
     @MessageBody() createMessageDto: any,
     @ConnectedSocket() client: Socket,
   ) {
-    const { content } = createMessageDto;
+    this.counter = this.counter + 1;
+    const { content, cordinates } = createMessageDto;
+    console.log('🚀 ~ DocmentGateway ~ cordinates:', this.counter,content);
 
     await this.redis.set('content', content);
     const sockets = await this.server.fetchSockets();
