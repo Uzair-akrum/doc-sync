@@ -11,12 +11,13 @@ datasource db {
 }
 
 model User {
-    id       Int            @id @default(autoincrement())
-    name     String
-    email    String         @unique
-    password String
-    posts    Post[]
-    follower UserFollower[]
+    id           Int            @id @default(autoincrement())
+    name         String         @unique
+    email        String         @unique
+    password     String
+    documents    Document[]
+    Post         Post[]
+    UserFollower UserFollower[]
 }
 
 model Post {
@@ -36,10 +37,9 @@ model Post {
 }
 
 model Image {
-    id  Int    @id @default(autoincrement())
-    url String
-
-    post   Post @relation(fields: [postId], references: [id])
+    id     Int    @id @default(autoincrement())
+    url    String
+    post   Post   @relation(fields: [postId], references: [id])
     postId Int
 }
 
@@ -64,4 +64,11 @@ model UserFollower {
     follower   Follower @relation(fields: [followerId], references: [id])
 
     @@unique([userId, followerId])
+}
+
+model Document {
+    id      Int     @id @default(autoincrement())
+    author  String
+    content String? @default("")
+    user    User    @relation(fields: [author], references: [name])
 }
