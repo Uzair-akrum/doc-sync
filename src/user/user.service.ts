@@ -13,7 +13,6 @@ export class UserService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly kafkaConsumer: KafkajsConsumer,
-    private readonly kafkajsAdmin: KafkajsAdmin,
   ) {}
 
   async create(createUserInput: CreateUserInput) {
@@ -26,7 +25,10 @@ export class UserService {
 
   async followUser(createFollowerInput: CreateFollowerInput) {
     const { userId, followerId } = createFollowerInput;
-    console.log("🚀 ~ file: user.service.ts:29 ~ UserService ~ followUser ~ userId:", userId)
+    console.log(
+      '🚀 ~ file: user.service.ts:29 ~ UserService ~ followUser ~ userId:',
+      userId,
+    );
 
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     //const follower = await this.prisma.follower.create({
@@ -38,7 +40,6 @@ export class UserService {
     //const userFollower = await this.prisma.userFollower.create({
     //  data: createFollowerInput,
     //});
-    await this.kafkajsAdmin.createTopic(`notify-${user.id}`);
 
     await this.kafkaConsumer.subscribe(`notify-${user.id}`);
     return null;

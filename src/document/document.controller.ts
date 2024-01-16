@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { DocumentService } from './document.service';
 
 @Controller('document')
@@ -15,10 +15,13 @@ export class DocumentController {
     );
     return document;
   }
+  @Get('list/:name')
+  async getDocumentListing(@Param('name') name: string) {
+    return await this.documentService.getDocumentByAuthor(name);
+  }
   @Post()
   async createDocument(@Body() createDocumentDto: any) {
-    console.log("🚀 ~ DocumentController ~ createDocument ~ createDocumentDto:", createDocumentDto)
-    const data = JSON.parse(createDocumentDto);
-    return await this.documentService.createDocument(data);
+    const { name } = createDocumentDto;
+    return await this.documentService.createDocument(name);
   }
 }
