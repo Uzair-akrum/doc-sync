@@ -69,6 +69,6 @@ model UserFollower {
 model Document {
     id      Int     @id @default(autoincrement())
     author  String
-    content String? @default("")
+    content String? @default("Untitled")
     user    User    @relation(fields: [author], references: [name])
 }
