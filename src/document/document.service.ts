@@ -21,9 +21,13 @@ export class DocumentService {
   async getDocumentbyId() {
     return await this.redis.get('content');
   }
-  async createDocument(createDocument: any) {
-    const { name } = createDocument;
-    console.log("🚀 ~ DocumentService ~ createDocument ~ name:", name)
+  async createDocument(name: any) {
+    console.log('🚀 ~ DocumentService ~ createDocument ~ name:', name);
     return await this.prismaService.document.create({ data: { author: name } });
+  }
+  async getDocumentByAuthor(name: string) {
+    return await this.prismaService.document.findMany({
+      where: { author: name },
+    });
   }
 }

@@ -2,25 +2,26 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostInput } from './dto/create-post.input';
 import { UpdatePostInput } from './dto/update-post.input';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { KafkaService } from 'src/kafka/kafka.service';
 import { KafkajsProducer } from 'src/kafka/kafka.producer';
+import { KafkajsConsumer } from 'src/kafka/kafka.consumer';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PostService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly kafkaProducer: KafkajsProducer,
+    private readonly kafkaConsumer: KafkajsConsumer,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
   async create(createPostInput: CreatePostInput) {
     const { title, authorId, content } = createPostInput;
     const post = await this.prisma.post.create({
       data: { title, authorId, content },
     });
-    await this.kafkaProducer.produce(
-      'notify',
-      post.authorId.toString(),
-      post,
-    );
+
+    await this.kafkaProducer.produce('notify', post.authorId.toString(), post);
+    await this.eventEmitter.emit('consume');
     return post;
   }
 

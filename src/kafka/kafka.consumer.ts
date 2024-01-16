@@ -1,45 +1,54 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnApplicationBootstrap,
+  OnModuleInit,
+} from '@nestjs/common';
 import { Consumer } from 'kafkajs';
 import { sleep } from '../utils/sleep';
 import { KafkaService } from './kafka.service';
+import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
-export class KafkajsConsumer implements OnModuleInit {
+export class KafkajsConsumer implements OnApplicationBootstrap {
   private readonly consumer: Consumer;
   private readonly logger: Logger;
+  private static isSubscribed: boolean = false;
 
-  constructor(private readonly kafkaService: KafkaService) {
+  constructor(
+    private readonly kafkaService: KafkaService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {
     this.consumer = this.kafkaService.getConsumer('test_id');
     this.logger = new Logger(KafkajsConsumer.name);
+    this.logger.log('constructor-------');
   }
 
-  async onModuleInit() {
-    this.logger.log('Consumer Connecting==');
-
+  async onApplicationBootstrap() {
     await this.connect();
-    this.logger.log('Consumer Connected==');
-
-    await this.consume();
-    this.logger.log('Consumed==');
   }
   async onModuleDestroy() {
+    console.log('destroy=====');
     await this.disconnect();
   }
   async subscribe(topic) {
+    KafkajsConsumer.isSubscribed = true;
+
     await this.consumer.subscribe({
       topic,
-      fromBeginning: true,
     });
   }
+  @OnEvent('consume')
   async consume() {
-    console.log('Message Consumed=====');
-
-    await this.consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
-        this.logger.log(`- ${prefix} ${message.key}#${message.value}`);
-      },
-    });
+    console.log(KafkajsConsumer.isSubscribed);
+    if (KafkajsConsumer.isSubscribed) {
+      await this.consumer.run({
+        eachMessage: async ({ topic, partition, message }) => {
+          const prefix = `${topic}[${partition} | ${message.offset}] / ${message.timestamp}`;
+          this.logger.log(`- ${prefix} ${message.key}#${message.value}`);
+        },
+      });
+    }
   }
 
   async connect() {
